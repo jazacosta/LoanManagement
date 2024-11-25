@@ -11,7 +11,7 @@ public class SimulatorValidation : AbstractValidator<InstallmentSimDTO>
             .NotEmpty()
             .GreaterThan(0).WithMessage("The amount must be greater than 0.");
 
-        RuleFor(x => x.Term)
+        RuleFor(x => x.TermInMonths)
             .NotEmpty()
             .GreaterThan(0).WithMessage("The term must be greater than 0.");
     }

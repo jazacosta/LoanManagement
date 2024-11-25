@@ -24,7 +24,7 @@ public class TermInterestRateRepository : ITermInterestRateRepository
 
         return new TermInterestRateResponseDTO //mappear!!
         {
-            Term = termInterestRate.TermInMonths,
+            TermInMonths = termInterestRate.TermInMonths,
             InterestRate = termInterestRate.InterestRate
         };
     }

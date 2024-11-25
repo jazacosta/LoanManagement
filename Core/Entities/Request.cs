@@ -4,7 +4,7 @@ public class Request
 {
     public int Id { get; set; }
     public string LoanType { get; set; } = string.Empty;
-    public int Amount { get; set; }
+    public int Amount { get; set; } //change to decimal
     public string Status { get; set; } = string.Empty;
 
     public int CustomerId { get; set; }
