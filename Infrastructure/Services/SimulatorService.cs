@@ -13,22 +13,36 @@ public class SimulatorService : ISimulatorService
         _termInterestRateRepository = termInterestRateRepository;
     }
 
+    private static decimal Pow(decimal baseValue, int exponent)
+    {
+        decimal result = 1;
+        for (int i = 0; i < exponent; i++)
+        {
+            result *= baseValue;
+        }
+        return result;
+    }
+
     public async Task<InstallmentSimResponseDTO> SimulateInstallment(InstallmentSimDTO installmentSimDTO)
     {
         var termInterestRate = await _termInterestRateRepository.GetInterestRateByTerm(installmentSimDTO.TermInMonths);
 
-        // Perform calculation
-        var monthlyInterestRate = termInterestRate.InterestRate / 12 / 100;
-        var monthlyInstallment = installmentSimDTO.Amount 
-                                * (monthlyInterestRate * Math.Pow(1 + monthlyInterestRate, installmentSimDTO.TermInMonths)) 
-                                / (Math.Pow(1 + monthlyInterestRate, installmentSimDTO.TermInMonths) - 1);
+        //obtains the monthly interest rate
+        var monthlyInterestRate = (decimal)(termInterestRate.InterestRate / 100) / 12;
+        
+        //uses Pow (to manage decimals) method to calculate monthly installment
+        var numerator = monthlyInterestRate * Pow(1 + monthlyInterestRate, installmentSimDTO.TermInMonths);
+        var denominator = Pow(1 + monthlyInterestRate, installmentSimDTO.TermInMonths) - 1;
+        //this uses the french system btw
+
+        var monthlyInstallment = installmentSimDTO.Amount * numerator / denominator;
         var totalToPay = monthlyInstallment * installmentSimDTO.TermInMonths;
 
-        // Return response
+        //mappear!!
         return new InstallmentSimResponseDTO
         {
-            TotalToPay = Math.Round((decimal)totalToPay, 2),
-            MonthlyInstallment = Math.Round((decimal)monthlyInstallment, 2)
+            MonthlyInstallment = monthlyInstallment,
+            TotalToPay = totalToPay
         };
     }
 }
