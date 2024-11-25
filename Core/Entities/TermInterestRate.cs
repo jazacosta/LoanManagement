@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class TermInterestRate //guardar el plazo y relacionar con el interes
+public class TermInterestRate
 {
     public int Id { get; set; }
     public int TermInMonths { get; set; }
