@@ -20,9 +20,10 @@ namespace Infrastructure.Configuration
                 .Property(x => x.Status)
                 .IsRequired();
 
-            entity.HasOne(x => x.Installment)
-              .WithOne(x => x.Payment)
-              .HasForeignKey<Payment>(x => x.InstallmentId);
+            entity
+                .HasOne(x => x.Installment)
+                .WithMany(x => x.Payments)
+                .HasForeignKey(x => x.InstallmentId);
 
         }
 

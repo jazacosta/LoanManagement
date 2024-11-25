@@ -22,16 +22,16 @@ public class LoanRequestService : ILoanRequestService
     public async Task<LoanRequestResponseDTO> CreateLoanRequest(LoanRequestDTO loanRequestDTO)
     {
         var term = await _termInterestRateRepository.GetInterestRateByTerm(loanRequestDTO.TermInMonths);
-        if (term == null)
-            throw new ArgumentException("The specified term is not valid.");
+        if (term == null) throw new ArgumentException("The specified term is not valid.");
 
-        var loanRequest = new Request //mappear!!
+        var loanRequest = new LoanRequest //mappear!!
         {
+            CustomerId = loanRequestDTO.CustomerId,
             LoanType = loanRequestDTO.LoanType,
             Amount = loanRequestDTO.Amount,
             TermInterestRateId = term.Id,
             Status = "Pending Approval", // Initial state
-            CustomerId = 1 // Replace with actual CustomerId (e.g., from Auth context)
+            //CustomerId = 1 // Replace with actual CustomerId (e.g., from Auth context)
         };
 
         var result = await _loanRequestRepository.AddLoanRequest(loanRequest);
@@ -39,6 +39,7 @@ public class LoanRequestService : ILoanRequestService
         return new LoanRequestResponseDTO //mappear!!
         {
             Id = result.Id,
+            CustomerId = result.CustomerId,
             LoanType = result.LoanType,
             Amount = result.Amount,
             TermInMonths = term.TermInMonths,

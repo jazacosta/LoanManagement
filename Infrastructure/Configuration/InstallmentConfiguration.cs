@@ -26,13 +26,15 @@ namespace Infrastructure.Configuration
                 .Property(x => x.Status)
                 .IsRequired();
 
-            entity.HasOne(x => x.ApprovedLoan)
-              .WithMany(x => x.Installments)
-              .HasForeignKey(x => x.ApprovedLoanId);
+            entity
+                .HasOne(x => x.ApprovedLoan)
+                .WithMany(x => x.Installments)
+                .HasForeignKey(x => x.ApprovedLoanId);
 
-            entity.HasOne(x => x.Payment)
-                  .WithOne(x => x.Installment)
-                  .HasForeignKey<Payment>(x => x.InstallmentId);
+            entity
+                .HasMany(x => x.Payments)
+                .WithOne(x => x.Installment)
+                .HasForeignKey(x => x.InstallmentId);
         }
     }
 }

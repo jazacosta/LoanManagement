@@ -11,9 +11,6 @@ namespace Infrastructure.Configuration
             entity.HasKey(x => x.Id);
 
             entity
-                .Property(x => x.ApprovalDate)
-                .IsRequired();
-            entity
                 .Property(x => x.LoanType)
                 .IsRequired();
             entity
@@ -22,14 +19,24 @@ namespace Infrastructure.Configuration
             entity
                 .Property(x => x.InterestRate)
                 .IsRequired();
+            entity
+                .Property(x => x.ApprovalDate)
+                .IsRequired();
 
-            entity.HasOne(x => x.Request)
-              .WithOne(x => x.ApprovedLoan)
-              .HasForeignKey<ApprovedLoan>(x => x.RequestId);
+            entity
+                .HasOne(x => x.LoanRequest)
+                .WithOne(x => x.ApprovedLoan)
+                .HasForeignKey<ApprovedLoan>(x => x.LoanRequestId);
 
-            entity.HasOne(x => x.Customer)
-                  .WithMany(x => x.ApprovedLoans)
-                  .HasForeignKey(x => x.CustomerId);
+            entity
+                .HasOne(x => x.Customer)
+                .WithMany(x => x.ApprovedLoans)
+                .HasForeignKey(x => x.CustomerId);
+
+            entity
+                .HasMany(x => x.Installments)
+                .WithOne(x => x.ApprovedLoan)
+                .HasForeignKey(x => x.ApprovedLoanId);
         }
     }
 }

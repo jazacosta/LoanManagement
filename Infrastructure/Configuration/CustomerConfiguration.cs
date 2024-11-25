@@ -20,16 +20,21 @@ namespace Infrastructure.Configuration
                 .Property(x => x.Email)
                 .IsRequired();
             entity
+                .Property(x => x.Phone)
+                .IsRequired();
+            entity
                 .Property(x => x.Address)
                 .IsRequired();
 
-            entity.HasMany(x => x.ApprovedLoans)
-              .WithOne(x => x.Customer)
-              .HasForeignKey(x => x.CustomerId);
+            entity
+                .HasMany(x => x.ApprovedLoans)
+                .WithOne(x => x.Customer)
+                .HasForeignKey(x => x.CustomerId);
 
-            entity.HasMany(x => x.Requests)
-                  .WithOne(x => x.Customer)
-                  .HasForeignKey(x => x.CustomerId);
+            entity
+                .HasMany(x => x.LoanRequests)
+                .WithOne(x => x.Customer)
+                .HasForeignKey(x => x.CustomerId);
         }
 
     }

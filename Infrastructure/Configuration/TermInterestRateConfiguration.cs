@@ -17,9 +17,10 @@ namespace Infrastructure.Configuration
                 .Property(x => x.InterestRate)
                 .IsRequired();
 
-            entity.HasMany(x => x.Requests)
-                  .WithOne(x => x.TermInterestRate)
-                  .HasForeignKey(x => x.TermInterestRateId);
+            entity
+                .HasMany(x => x.LoanRequests)
+                .WithOne(x => x.TermInterestRate)
+                .HasForeignKey(x => x.TermInterestRateId);
         }
     }
 }

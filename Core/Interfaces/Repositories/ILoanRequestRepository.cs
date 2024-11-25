@@ -4,5 +4,5 @@ namespace Core.Interfaces.Repositories;
 
 public interface ILoanRequestRepository
 {
-    Task<Request> AddLoanRequest(Request request);
+    Task<LoanRequest> AddLoanRequest(LoanRequest request);
 }

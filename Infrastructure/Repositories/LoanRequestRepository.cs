@@ -14,7 +14,7 @@ internal class LoanRequestRepository : ILoanRequestRepository
         _context = context;
     }
 
-    public async Task<Request> AddLoanRequest(Request request)
+    public async Task<LoanRequest> AddLoanRequest(LoanRequest request)
     {
         _context.Requests.Add(request);
         await _context.SaveChangesAsync();

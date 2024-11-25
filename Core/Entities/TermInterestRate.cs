@@ -6,5 +6,5 @@ public class TermInterestRate
     public int TermInMonths { get; set; }
     public float InterestRate { get; set; }
 
-    public List<Request> Requests { get; set; } = [];
+    public List<LoanRequest> LoanRequests { get; set; } = [];
 }
