@@ -34,15 +34,15 @@ public class SimulatorService : ISimulatorService
         var numerator = monthlyInterestRate * Pow(1 + monthlyInterestRate, installmentSimDTO.TermInMonths);
         var denominator = Pow(1 + monthlyInterestRate, installmentSimDTO.TermInMonths) - 1;
         //this uses the french system btw
-
+        //?
         var monthlyInstallment = installmentSimDTO.Amount * numerator / denominator;
         var totalToPay = monthlyInstallment * installmentSimDTO.TermInMonths;
 
         //mappear!!
         return new InstallmentSimResponseDTO
         {
-            MonthlyInstallment = monthlyInstallment,
-            TotalToPay = totalToPay
+            MonthlyInstallment = Math.Round(monthlyInstallment),
+            TotalToPay = Math.Round(totalToPay)
         };
     }
 }

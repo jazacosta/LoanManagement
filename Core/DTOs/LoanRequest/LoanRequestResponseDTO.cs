@@ -7,5 +7,5 @@ public class LoanRequestResponseDTO
     public string LoanType { get; set; } = string.Empty;
     public decimal Amount { get; set; }
     public int TermInMonths { get; set; }
-    public string Status { get; set; } = string.Empty; //intialize in mapping / Default State: Pending Approval
+    public string Status { get; set; } = "Pending Approval"; //intialize in mapping / Default State: Pending Approval
 }

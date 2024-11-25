@@ -16,7 +16,7 @@ public class LoanRequestController : BaseApiController
     [HttpPost("loan-request")]
     public async Task<IActionResult> CreateLoanRequest([FromBody] LoanRequestDTO loanRequestDTO)
     {
-        var result = await _loanRequestService.CreateLoanRequest(loanRequestDTO);
+        var result = await _loanRequestService.CreateLoanRequest(loanRequestDTO); //
         return Ok(result);
     }
 }
