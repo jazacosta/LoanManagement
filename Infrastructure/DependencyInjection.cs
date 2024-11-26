@@ -25,6 +25,7 @@ namespace Infrastructure
             services.AddServices();
             services.AddRepositories();
             //services.AddValidations();
+            //services.AddMapping();
             services.AddAuth();
 
             return services;
@@ -48,6 +49,9 @@ namespace Infrastructure
         {
             services.AddScoped<ISimulatorService, SimulatorService>();
             services.AddScoped<ILoanRequestService, LoanRequestService>();
+            services.AddScoped<IAuthService, AuthService>();
+            //services.AddScoped<IInstallmentService, InstallmentService>();
+            services.AddScoped<ILoanService, LoanService>();
 
             return services;
         }
@@ -56,6 +60,8 @@ namespace Infrastructure
         {
             services.AddScoped<ITermInterestRateRepository, TermInterestRateRepository>();
             services.AddScoped<ILoanRequestRepository, LoanRequestRepository>();
+            //services.AddScoped<IInstallmentRepository, InstallmentRepository>();
+            services.AddScoped<ILoanRepository, LoanRepository>();
 
             return services;
         }
