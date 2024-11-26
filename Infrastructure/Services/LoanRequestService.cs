@@ -30,7 +30,9 @@ public class LoanRequestService : ILoanRequestService
 
         //Environment.Exit(0 );
         var term = await _termInterestRateRepository.GetInterestRateByTerm(loanRequestDTO.TermInMonths);
-        if (term == null) throw new ArgumentException("The specified term is not valid.");
+        if (term == null) 
+            throw new KeyNotFoundException($"No interest rate found for term: {loanRequestDTO.TermInMonths} months.");
+
         DateTime dateTime = DateTime.UtcNow;
 
         var loanRequest = new LoanRequest 
@@ -43,9 +45,9 @@ public class LoanRequestService : ILoanRequestService
             Status = "Pending Approval"
         };
 
-        var result = await _loanRequestRepository.AddLoanRequest(loanRequest); //
+        var result = await _loanRequestRepository.AddLoanRequest(loanRequest);
 
-        return new LoanRequestResponseDTO //mappear!!
+        return new LoanRequestResponseDTO
         {
             Id = result.Id,
             CustomerId = result.CustomerId,
