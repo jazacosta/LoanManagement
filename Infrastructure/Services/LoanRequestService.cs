@@ -21,20 +21,29 @@ public class LoanRequestService : ILoanRequestService
 
     public async Task<LoanRequestResponseDTO> CreateLoanRequest(LoanRequestDTO loanRequestDTO)
     {
+    //    Console.WriteLine($"Loan Request Details:\n" +
+    //$"Customer ID: {loanRequestDTO.CustomerId}\n" +
+    //$"Loan Type: {loanRequestDTO.LoanType}\n" +
+    //$"Amount: {loanRequestDTO.Amount}\n" +
+    //$"Term Interest Rate ID: {loanRequestDTO.TermInMonths}\n" +
+    //$"Status: Pending Approval");
+
+        //Environment.Exit(0 );
         var term = await _termInterestRateRepository.GetInterestRateByTerm(loanRequestDTO.TermInMonths);
         if (term == null) throw new ArgumentException("The specified term is not valid.");
+        DateTime dateTime = DateTime.UtcNow;
 
-        var loanRequest = new LoanRequest //mappear!!
+        var loanRequest = new LoanRequest 
         {
             CustomerId = loanRequestDTO.CustomerId,
+            RequestDate = dateTime,
             LoanType = loanRequestDTO.LoanType,
             Amount = loanRequestDTO.Amount,
-            TermInterestRateId = term.Id,
-            Status = "Pending Approval", // Initial state
-            //CustomerId = 1 // Replace with actual CustomerId (e.g., from Auth context)
+            TermInterestRateId = term.Id,   
+            Status = "Pending Approval"
         };
 
-        var result = await _loanRequestRepository.AddLoanRequest(loanRequest);
+        var result = await _loanRequestRepository.AddLoanRequest(loanRequest); //
 
         return new LoanRequestResponseDTO //mappear!!
         {
@@ -42,6 +51,7 @@ public class LoanRequestService : ILoanRequestService
             CustomerId = result.CustomerId,
             LoanType = result.LoanType,
             Amount = result.Amount,
+            RequestDate = dateTime,
             TermInMonths = term.TermInMonths,
             Status = result.Status
         };

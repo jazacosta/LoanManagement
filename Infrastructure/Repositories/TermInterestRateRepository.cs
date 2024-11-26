@@ -18,12 +18,21 @@ public class TermInterestRateRepository : ITermInterestRateRepository
     {
         var termInterestRate = await _context.TermInterestRates
             .FirstOrDefaultAsync(x => x.TermInMonths == TermInMonths);
+        var response = new TermInterestRateResponseDTO
+        {
+            Id = termInterestRate.Id,
+            TermInMonths = termInterestRate.TermInMonths,
+            InterestRate = termInterestRate.InterestRate
+        };
 
+        // Salida en consola
+        
         if (termInterestRate == null)
             throw new ArgumentException($"No interest rate found for term: {TermInMonths} months.");
 
         return new TermInterestRateResponseDTO //mappear!!
         {
+            Id = termInterestRate.Id,
             TermInMonths = termInterestRate.TermInMonths,
             InterestRate = termInterestRate.InterestRate
         };
