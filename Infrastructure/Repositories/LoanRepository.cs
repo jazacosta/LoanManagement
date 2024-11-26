@@ -51,18 +51,6 @@ public class LoanRepository : ILoanRepository
 
     }
 
-    //public async Task SaveInstallments(List<Installment> installments)
-    //{
-    //    try
-    //    {
-    //        await _context.Installments.AddRangeAsync(installments);
-    //        await _context.SaveChangesAsync();
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        throw new InvalidOperationException("An error has occurred while trying to save the installments.", ex);
-    //    }
-    //}
 
     public async Task UpdateLoanRequest(LoanRequest loanRequest)
     {

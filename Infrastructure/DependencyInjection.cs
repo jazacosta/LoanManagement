@@ -60,7 +60,7 @@ namespace Infrastructure
         {
             services.AddScoped<ITermInterestRateRepository, TermInterestRateRepository>();
             services.AddScoped<ILoanRequestRepository, LoanRequestRepository>();
-            //services.AddScoped<IInstallmentRepository, InstallmentRepository>();
+            services.AddScoped<IInstallmentRepository, InstallmentRepository>();
             services.AddScoped<ILoanRepository, LoanRepository>();
 
             return services;

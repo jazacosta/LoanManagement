@@ -18,15 +18,17 @@ public class LoanController : BaseApiController
     //[Authorize(Roles = "admin")]
     public async Task<IActionResult> ApproveLoan([FromBody] ApprovedLoanDTO loanApproval, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _loanService.ApproveLoan(loanApproval, cancellationToken);
-            return Ok("Loan successfully approved.");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        //try
+        //{
+        //    await _loanService.ApproveLoan(loanApproval, cancellationToken);
+        //    return Ok("Loan successfully approved.");
+        //}
+        //catch (Exception ex)
+        //{
+        //    return BadRequest(ex.Message);
+        //}
+        await _loanService.ApproveLoan(loanApproval, cancellationToken);
+        return Ok("Loan successfully approved.");
     }
 
     [HttpPost("reject")]

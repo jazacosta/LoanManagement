@@ -8,10 +8,12 @@ namespace Infrastructure.Services;
 public class LoanService : ILoanService
 {
     private readonly ILoanRepository _loanRepository;
+    private readonly IInstallmentRepository _installmentRepository;
 
-    public LoanService(ILoanRepository loanRepository)
+    public LoanService(ILoanRepository loanRepository, IInstallmentRepository installmentRepository)
     {
         _loanRepository = loanRepository;
+        _installmentRepository = installmentRepository;
     }
 
     public async Task ApproveLoan(ApprovedLoanDTO loanApproval, CancellationToken cancellationToken = default)
@@ -24,6 +26,7 @@ public class LoanService : ILoanService
         if (term == null)
             throw new InvalidOperationException("No valid interest rate was found for this term.");
 
+        
         var approvedLoan = new ApprovedLoan
         {
             LoanType = loanRequest.LoanType,
@@ -32,14 +35,19 @@ public class LoanService : ILoanService
             ApprovalDate = DateTime.UtcNow,
             CustomerId = loanRequest.CustomerId,
             LoanRequestId = loanRequest.Id,
-            Installments = GenerateInstallments(
-                loanRequest.Amount, 
-                term.InterestRate, 
-                loanRequest.TermInMonths),
+            Installments = [],
             TermInterestRateId = term.Id  
         };
-
         await _loanRepository.SaveApprovedLoan(approvedLoan, cancellationToken);
+
+        var installments = GenerateInstallments(approvedLoan.RequestAmount, approvedLoan.InterestRate, term.TermInMonths);
+
+        foreach (var installment in installments)
+        {
+            installment.ApprovedLoanId = approvedLoan.LoanRequestId;
+            await _installmentRepository.AddInstallment(installment);
+        }
+
 
         loanRequest.Status = "Approved";
         await _loanRepository.UpdateLoanRequest(loanRequest);
@@ -63,7 +71,8 @@ public class LoanService : ILoanService
                 InterestAmount = interestAmount,
                 TotalAmount = capitalAmount + interestAmount,
                 DueDate = DateTime.UtcNow.AddMonths(i).ToUniversalTime(),
-                Status = "Pending"
+                Status = "Pending",
+                //ApprovedLoanId = 0
             });
         }
 
