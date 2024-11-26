@@ -6,10 +6,14 @@ using FluentValidation;
 using Infrastructure.Contexts;
 using Infrastructure.Repositories;
 using Infrastructure.Services;
+using Infrastructure.Services.Authentication;
 using Infrastructure.Validations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Infrastructure
 {
@@ -20,6 +24,8 @@ namespace Infrastructure
             services.AddDatabase(configuration);
             services.AddServices();
             services.AddRepositories();
+            //services.AddValidations();
+            services.AddAuth();
 
             return services;
         }
@@ -58,6 +64,29 @@ namespace Infrastructure
         {
             services.AddScoped<IValidator<InstallmentSimDTO>, SimulatorValidation>();
             services.AddScoped<IValidator<LoanRequestDTO>, LoanRequestValidation>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddAuth(this IServiceCollection services)
+        {
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtConfig.Secret))
+                };
+            });
+
+            services.AddTransient<AuthService>();
 
             return services;
         }
