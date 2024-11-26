@@ -13,7 +13,7 @@ public class LoanRequestController : BaseApiController
         _loanRequestService = loanRequestService;
     }
 
-    [HttpPost("loan-request")]
+    [HttpPost("create-loan-request")]
     public async Task<IActionResult> CreateLoanRequest([FromBody] LoanRequestDTO loanRequestDTO)
     {
         try

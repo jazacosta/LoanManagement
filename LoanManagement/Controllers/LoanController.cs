@@ -16,11 +16,11 @@ public class LoanController : BaseApiController
 
     [HttpPost("approve")]
     //[Authorize(Roles = "admin")]
-    public async Task<IActionResult> ApproveLoan([FromBody] ApprovedLoanDTO loanApproval)
+    public async Task<IActionResult> ApproveLoan([FromBody] ApprovedLoanDTO loanApproval, CancellationToken cancellationToken)
     {
         try
         {
-            await _loanService.ApproveLoan(loanApproval);
+            await _loanService.ApproveLoan(loanApproval, cancellationToken);
             return Ok("Loan successfully approved.");
         }
         catch (Exception ex)

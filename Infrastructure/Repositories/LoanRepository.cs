@@ -31,17 +31,38 @@ public class LoanRepository : ILoanRepository
         return term!;
     }
 
-    public async Task SaveApprovedLoan(ApprovedLoan approvedLoan)
+    public async Task SaveApprovedLoan(ApprovedLoan approvedLoan, CancellationToken cancellationToken)
     {
-        await _context.ApprovedLoans.AddAsync(approvedLoan);
-        await _context.SaveChangesAsync();
+        using var transaction =  await _context.Database.BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            await _context.ApprovedLoans.AddAsync(approvedLoan, cancellationToken);
+            await _context.Installments.AddRangeAsync(approvedLoan.Installments, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw new InvalidOperationException("An error has occurred while trying to save the Loan and its Installments.", ex);
+        }
+
     }
 
-    public async Task SaveInstallments(List<Installment> installments)
-    {
-        await _context.Installments.AddRangeAsync(installments);
-        await _context.SaveChangesAsync();
-    }
+    //public async Task SaveInstallments(List<Installment> installments)
+    //{
+    //    try
+    //    {
+    //        await _context.Installments.AddRangeAsync(installments);
+    //        await _context.SaveChangesAsync();
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        throw new InvalidOperationException("An error has occurred while trying to save the installments.", ex);
+    //    }
+    //}
 
     public async Task UpdateLoanRequest(LoanRequest loanRequest)
     {

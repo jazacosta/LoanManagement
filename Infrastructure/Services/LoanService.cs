@@ -14,57 +14,55 @@ public class LoanService : ILoanService
         _loanRepository = loanRepository;
     }
 
-    public async Task ApproveLoan(ApprovedLoanDTO loanApproval)
+    public async Task ApproveLoan(ApprovedLoanDTO loanApproval, CancellationToken cancellationToken = default)
     {
         var loanRequest = await _loanRepository.GetLoanRequestById(loanApproval.LoanRequestId);
         if (loanRequest == null || loanRequest.Status != "Pending Approval")
             throw new InvalidOperationException("The request is not available for approval.");
 
-        // var termInterestRate = loanRequest.TermInterestRate;
-        var termn = await _loanRepository.GetTerm(loanRequest.TermInterestRateId);
-        if (termn == null)
+        var term = await _loanRepository.GetTerm(loanRequest.TermInterestRateId);
+        if (term == null)
             throw new InvalidOperationException("No valid interest rate was found for this term.");
-
-        // Convertir la tasa de interés de float a decimal
-        //decimal interestRateDecimal = (decimal)termInterestRate.InterestRate;
 
         var approvedLoan = new ApprovedLoan
         {
             LoanType = loanRequest.LoanType,
             RequestAmount = loanRequest.Amount,
-            InterestRate = termn.InterestRate,
+            InterestRate = term.InterestRate,
             ApprovalDate = DateTime.UtcNow,
             CustomerId = loanRequest.CustomerId,
             LoanRequestId = loanRequest.Id,
-            Installments = GenerateInstallments(loanRequest.Amount, termn.InterestRate, loanRequest.TermInMonths),
-            TermInterestRateId = termn.Id
-            
+            Installments = GenerateInstallments(
+                loanRequest.Amount, 
+                term.InterestRate, 
+                loanRequest.TermInMonths),
+            TermInterestRateId = term.Id  
         };
 
-        //saves the loan app with its installments
-        await _loanRepository.SaveApprovedLoan(approvedLoan);
-        await _loanRepository.SaveInstallments(approvedLoan.Installments);
+        await _loanRepository.SaveApprovedLoan(approvedLoan, cancellationToken);
 
         loanRequest.Status = "Approved";
         await _loanRepository.UpdateLoanRequest(loanRequest);
     }
 
-    private List<Installment> GenerateInstallments(decimal Amount, float InterestRate, int TermInMonths) //on installments ig¿
+    private List<Installment> GenerateInstallments(decimal Amount, float InterestRate, int TermInMonths) 
     {
         var installments = new List<Installment>();
         var monthlyRate = InterestRate / 12 / 100;
-        var totalAmount = Amount * (decimal)(1 + monthlyRate * TermInMonths);
+        var remainingAmount = Amount;
 
         for (int i = 1; i <= TermInMonths; i++)
         {
+            var interestAmount = remainingAmount * (decimal)monthlyRate;
             var capitalAmount = Amount / TermInMonths;
-            var interestAmount = totalAmount / TermInMonths - capitalAmount;
+            remainingAmount -= capitalAmount;
+
             installments.Add(new Installment
             {
                 CapitalAmount = capitalAmount,
                 InterestAmount = interestAmount,
                 TotalAmount = capitalAmount + interestAmount,
-                DueDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month + i, 1).ToUniversalTime(),
+                DueDate = DateTime.UtcNow.AddMonths(i).ToUniversalTime(),
                 Status = "Pending"
             });
         }
