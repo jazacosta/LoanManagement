@@ -2,6 +2,7 @@
 using Core.Entities;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
+using Mapster;
 
 namespace Infrastructure.Services;
 
@@ -16,38 +17,23 @@ public class LoanService : ILoanService
         _installmentRepository = installmentRepository;
     }
 
-    public async Task ApproveLoan(ApprovedLoanDTO loanApproval, CancellationToken cancellationToken = default)
+    public async Task ApproveLoan(int Id)
     {
-        var loanRequest = await _loanRepository.GetLoanRequestById(loanApproval.LoanRequestId);
+        var loanRequest = await _loanRepository.GetLoanRequestById(Id);
         if (loanRequest == null || loanRequest.Status != "Pending Approval")
             throw new InvalidOperationException("The request is not available for approval.");
 
-        var term = await _loanRepository.GetTerm(loanRequest.TermInterestRateId);
-        if (term == null)
-            throw new InvalidOperationException("No valid interest rate was found for this term.");
 
-        
-        var approvedLoan = new ApprovedLoan
-        {
-            LoanType = loanRequest.LoanType,
-            RequestAmount = loanRequest.Amount,
-            InterestRate = term.InterestRate,
-            ApprovalDate = DateTime.UtcNow,
-            CustomerId = loanRequest.CustomerId,
-            LoanRequestId = loanRequest.Id,
-            Installments = [],
-            TermInterestRateId = term.Id  
-        };
-        await _loanRepository.SaveApprovedLoan(approvedLoan, cancellationToken);
+        var approvedLoan = loanRequest.Adapt<ApprovedLoan>();
+        await _loanRepository.SaveApprovedLoan(approvedLoan);
 
-        var installments = GenerateInstallments(approvedLoan.RequestAmount, approvedLoan.InterestRate, term.TermInMonths);
+        var installments = GenerateInstallments(approvedLoan.RequestAmount, approvedLoan.InterestRate, loanRequest.TermInMonths);
 
         foreach (var installment in installments)
         {
             installment.ApprovedLoanId = approvedLoan.LoanRequestId;
             await _installmentRepository.AddInstallment(installment);
         }
-
 
         loanRequest.Status = "Approved";
         await _loanRepository.UpdateLoanRequest(loanRequest);
@@ -81,18 +67,18 @@ public class LoanService : ILoanService
     }
 
 
-    public async Task RejectLoan(RejectedLoanDTO loanRejection)
+    public async Task RejectLoan(int Id, string RejectionReason)
     {
-        var loanRequest = await _loanRepository.GetLoanRequestById(loanRejection.LoanRequestId);
+        var loanRequest = await _loanRepository.GetLoanRequestById(Id);
 
         if (loanRequest == null || loanRequest.Status != "Pending Approval") //searches for a lrID
             throw new InvalidOperationException("The loan request is not available for rejection.");
 
-        if (string.IsNullOrWhiteSpace(loanRejection.RejectionReason))
+        if (string.IsNullOrWhiteSpace(RejectionReason))
             throw new ArgumentException("You must provide a reason for the rejection.");
 
         loanRequest.Status = "Rejected";
-        loanRequest.RejectionReason = loanRejection.RejectionReason;
+        loanRequest.RejectionReason = RejectionReason;
         await _loanRepository.UpdateLoanRequest(loanRequest);
     }
 
@@ -100,6 +86,7 @@ public class LoanService : ILoanService
     public async Task<DetailedLoanDTO> GetLoanDetails(int approvedLoanId, CancellationToken cancellationToken = default)
     {
         var loan = await _loanRepository.GetApprovedLoanById(approvedLoanId, cancellationToken);
+        var term = await _loanRepository.GetTerm(loan.TermInterestRateId);
 
         if (loan == null)
             throw new KeyNotFoundException($"No approved loan found with ID {approvedLoanId}");
@@ -107,11 +94,17 @@ public class LoanService : ILoanService
         var totalToPay = loan.Installments.Sum(i => i.TotalAmount);
         var paidInstallments = loan.Installments.Count(i => i.Status == "Paid");
         var pendingInstallments = loan.Installments.Count(i => i.Status == "Pending");
-        var nextDueDate = loan.Installments
+
+        
+        var dueDate = loan.Installments
                               .Where(i => i.Status == "Pending")
                               .OrderBy(i => i.DueDate)
-                              .Select(i => (DateTime?)i.DueDate)
                               .FirstOrDefault();
+                              //.Select(i => (DateTime?)i.DueDate)
+
+        string message = dueDate != null
+            ? dueDate.DueDate.ToString("yyyy-MM-dd")
+            : "Todas las cuotas estan pagadas";
 
         return new DetailedLoanDTO
         {
@@ -121,12 +114,12 @@ public class LoanService : ILoanService
             RequestedAmount = loan.RequestAmount,
             TotalToPay = Math.Round(totalToPay),
             Profit = Math.Round(totalToPay - loan.RequestAmount),
-            TermInMonths = loan.TermInterestRate.TermInMonths,
+            TermInMonths = term.TermInMonths,
             LoanType = loan.LoanType,
             InterestRate = loan.InterestRate,
             PaidInstallments = paidInstallments,
             PendingInstallments = pendingInstallments,
-            NextDueDate = nextDueDate,
+            NextDueDate = message,
             Status = pendingInstallments == 0 ? "All installments are paid" : "Pending installments"
         };
     }

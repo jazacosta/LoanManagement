@@ -13,7 +13,7 @@
         public float InterestRate { get; set; }
         public int PaidInstallments { get; set; }
         public int PendingInstallments { get; set; }
-        public DateTime? NextDueDate { get; set; }
+        public string NextDueDate { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
     }
 }

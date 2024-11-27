@@ -4,7 +4,7 @@ namespace Core.Interfaces.Services;
 
 public interface ILoanService
 {
-    Task ApproveLoan(ApprovedLoanDTO loanApproval, CancellationToken cancellationToken = default);
-    Task RejectLoan(RejectedLoanDTO loanRejection);
+    Task ApproveLoan(int Id);
+    Task RejectLoan(int Id, string RejectionReason);
     Task<DetailedLoanDTO> GetLoanDetails(int approvedLoanId, CancellationToken cancellationToken = default);
 }

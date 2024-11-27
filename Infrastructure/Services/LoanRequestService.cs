@@ -40,6 +40,7 @@ public class LoanRequestService : ILoanRequestService
             CustomerId = loanRequestDTO.CustomerId,
             RequestDate = dateTime,
             LoanType = loanRequestDTO.LoanType,
+            TermInMonths = loanRequestDTO.TermInMonths,
             Amount = loanRequestDTO.Amount,
             TermInterestRateId = term.Id,   
             Status = "Pending Approval"

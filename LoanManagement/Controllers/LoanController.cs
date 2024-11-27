@@ -14,23 +14,23 @@ public class LoanController : BaseApiController
         _loanService = loanService;
     }
 
-    [HttpPost("approve")]
+    [HttpPost("{Id}/approve")]
     //[Authorize(Roles = "admin")]
-    public async Task<IActionResult> ApproveLoan([FromBody] ApprovedLoanDTO loanApproval, CancellationToken cancellationToken)
+    public async Task<IActionResult> ApproveLoan([FromRoute] int Id)
     {
         
-            await _loanService.ApproveLoan(loanApproval, cancellationToken);
+            await _loanService.ApproveLoan(Id);
             return Ok("Loan successfully approved.");
         
     }
 
-    [HttpPost("reject")]
-    [Authorize(Roles = "admin")]
-    public async Task<IActionResult> RejectLoan([FromBody] RejectedLoanDTO loanRejection)
+    [HttpPost("{Id}/reject")]
+    //[Authorize(Roles = "admin")]
+    public async Task<IActionResult> RejectLoan([FromRoute] int Id, [FromQuery] string RejectionReason)
     {
         try
         {
-            await _loanService.RejectLoan(loanRejection);
+            await _loanService.RejectLoan(Id, RejectionReason);
             return Ok("Loan successfully rejected.");
         }
         catch (Exception ex)

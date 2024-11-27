@@ -19,7 +19,7 @@ public class LoanRepository : ILoanRepository
         var approvedLoan = await _context.ApprovedLoans
                 .Include(x => x.Customer)
                 .Include(x => x.Installments)
-                .Include(x => x.TermInterestRate)
+                //.Include(x => x.TermInterestRate)
                 .FirstOrDefaultAsync(l => l.Id == loanId, cancellationToken);
         return approvedLoan;
     }
@@ -27,6 +27,7 @@ public class LoanRepository : ILoanRepository
     public async Task<LoanRequest> GetLoanRequestById(int Id)
     {
         var loanRequest = await _context.LoanRequests
+                .Include(x => x.TermInterestRate)
                 .FirstOrDefaultAsync(x => x.Id == Id && x.Status == "Pending Approval");
 
         if (loanRequest == null)
@@ -41,11 +42,11 @@ public class LoanRepository : ILoanRepository
         return term!;
     }
 
-    public async Task SaveApprovedLoan(ApprovedLoan approvedLoan, CancellationToken cancellationToken)
+    public async Task SaveApprovedLoan(ApprovedLoan approvedLoan)
     {
             _context.ApprovedLoans.Add(approvedLoan);
             _context.Installments.AddRange(approvedLoan.Installments);
-            await _context.SaveChangesAsync(cancellationToken);
+            await _context.SaveChangesAsync();
     }
 
     public async Task UpdateLoanRequest(LoanRequest loanRequest)
