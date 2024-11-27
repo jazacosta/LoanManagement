@@ -53,13 +53,15 @@ public class LoanService : ILoanService
         await _loanRepository.UpdateLoanRequest(loanRequest);
     }
 
-    private List<Installment> GenerateInstallments(decimal Amount, float InterestRate, int TermInMonths) 
+    private List<Installment> GenerateInstallments(decimal Amount, float InterestRate, int TermInMonths)
     {
         var installments = new List<Installment>();
         var monthlyRate = InterestRate / 12 / 100;
         var remainingAmount = Amount;
 
-        for (int i = 1; i <= TermInMonths; i++)
+        var firstDueDate = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1).AddMonths(1);
+
+        for (int i = 0; i < TermInMonths; i++)
         {
             var interestAmount = remainingAmount * (decimal)monthlyRate;
             var capitalAmount = Amount / TermInMonths;
@@ -70,7 +72,7 @@ public class LoanService : ILoanService
                 CapitalAmount = Math.Round(capitalAmount),
                 InterestAmount = Math.Round(interestAmount),
                 TotalAmount = Math.Round(capitalAmount + interestAmount),
-                DueDate = DateTime.UtcNow.AddMonths(i).ToUniversalTime(),
+                DueDate = firstDueDate.AddMonths(i).ToUniversalTime(),
                 Status = "Pending",
             });
         }
