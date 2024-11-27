@@ -16,8 +16,19 @@ namespace LoanManagement.Controllers
         [HttpPost("installment-simulator")]
         public async Task<IActionResult> SimulateInstallment([FromBody] InstallmentSimDTO installmentSimDTO)
         {
-            var result = await _simulatorService.SimulateInstallment(installmentSimDTO);
-            return Ok(result);
+            try
+            {
+                var result = await _simulatorService.SimulateInstallment(installmentSimDTO);
+                return Ok(result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+            }
         }
     }
 }

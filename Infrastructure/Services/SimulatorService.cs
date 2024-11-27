@@ -1,6 +1,8 @@
 ﻿using Core.DTOs.InstallmentSimulator;
+using Core.DTOs.Request;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
+using Mapster;
 
 namespace Infrastructure.Services;
 
@@ -26,23 +28,22 @@ public class SimulatorService : ISimulatorService
     public async Task<InstallmentSimResponseDTO> SimulateInstallment(InstallmentSimDTO installmentSimDTO)
     {
         var termInterestRate = await _termInterestRateRepository.GetInterestRateByTerm(installmentSimDTO.TermInMonths);
+        if (termInterestRate == null)
+            throw new KeyNotFoundException($"No interest rate found for term: {installmentSimDTO.TermInMonths} months.");
 
-        //obtains the monthly interest rate
         var monthlyInterestRate = (decimal)(termInterestRate.InterestRate / 100) / 12;
         
-        //uses Pow (to manage decimals) method to calculate monthly installment
         var numerator = monthlyInterestRate * Pow(1 + monthlyInterestRate, installmentSimDTO.TermInMonths);
         var denominator = Pow(1 + monthlyInterestRate, installmentSimDTO.TermInMonths) - 1;
-        //this uses the french system btw
-        //?
+       
         var monthlyInstallment = installmentSimDTO.Amount * numerator / denominator;
         var totalToPay = monthlyInstallment * installmentSimDTO.TermInMonths;
 
-        //mappear!!
-        return new InstallmentSimResponseDTO
-        {
-            MonthlyInstallment = Math.Round(monthlyInstallment),
-            TotalToPay = Math.Round(totalToPay)
-        };
+
+        var response = installmentSimDTO.Adapt<InstallmentSimResponseDTO>();
+        response.MonthlyInstallment = Math.Round(monthlyInstallment);
+        response.TotalToPay = Math.Round(totalToPay);
+        return response;
+
     }
 }

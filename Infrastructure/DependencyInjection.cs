@@ -8,11 +8,14 @@ using Infrastructure.Repositories;
 using Infrastructure.Services;
 using Infrastructure.Services.Authentication;
 using Infrastructure.Validations;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using System.Text;
 
 namespace Infrastructure
@@ -24,8 +27,8 @@ namespace Infrastructure
             services.AddDatabase(configuration);
             services.AddServices();
             services.AddRepositories();
-            //services.AddValidations();
-            //services.AddMapping();
+            services.AddValidations();
+            services.AddMapping();
             services.AddAuth();
 
             return services;
@@ -70,6 +73,16 @@ namespace Infrastructure
         {
             services.AddScoped<IValidator<InstallmentSimDTO>, SimulatorValidation>();
             services.AddScoped<IValidator<LoanRequestDTO>, LoanRequestValidation>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddMapping(this IServiceCollection services)
+        {
+            var config = TypeAdapterConfig.GlobalSettings;
+            config.Scan(Assembly.GetExecutingAssembly());
+            services.AddSingleton(config);
+            services.AddScoped<IMapper, ServiceMapper>();
 
             return services;
         }

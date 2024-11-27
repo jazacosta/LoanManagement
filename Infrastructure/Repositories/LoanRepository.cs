@@ -16,11 +16,12 @@ public class LoanRepository : ILoanRepository
 
     public async Task<ApprovedLoan> GetApprovedLoanById(int loanId, CancellationToken cancellationToken = default)
     {
-        return await _context.ApprovedLoans
-        .Include(x => x.Customer)
-        .Include(x => x.Installments)
-        .Include(x => x.TermInterestRate)
-        .FirstOrDefaultAsync(l => l.Id == loanId, cancellationToken);
+        var approvedLoan = await _context.ApprovedLoans
+                .Include(x => x.Customer)
+                .Include(x => x.Installments)
+                .Include(x => x.TermInterestRate)
+                .FirstOrDefaultAsync(l => l.Id == loanId, cancellationToken);
+        return approvedLoan;
     }
 
     public async Task<LoanRequest> GetLoanRequestById(int Id)
@@ -42,21 +43,9 @@ public class LoanRepository : ILoanRepository
 
     public async Task SaveApprovedLoan(ApprovedLoan approvedLoan, CancellationToken cancellationToken)
     {
-        using var transaction =  await _context.Database.BeginTransactionAsync(cancellationToken);
-
-        try
-        {
-            await _context.ApprovedLoans.AddAsync(approvedLoan, cancellationToken);
-            await _context.Installments.AddRangeAsync(approvedLoan.Installments, cancellationToken);
+            _context.ApprovedLoans.Add(approvedLoan);
+            _context.Installments.AddRange(approvedLoan.Installments);
             await _context.SaveChangesAsync(cancellationToken);
-
-            await transaction.CommitAsync(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            throw new InvalidOperationException("An error has occurred while trying to save the Loan and its Installments.", ex);
-        }
     }
 
     public async Task UpdateLoanRequest(LoanRequest loanRequest)

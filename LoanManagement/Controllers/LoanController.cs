@@ -15,18 +15,13 @@ public class LoanController : BaseApiController
     }
 
     [HttpPost("approve")]
-    [Authorize(Roles = "admin")]
+    //[Authorize(Roles = "admin")]
     public async Task<IActionResult> ApproveLoan([FromBody] ApprovedLoanDTO loanApproval, CancellationToken cancellationToken)
     {
-        try
-        {
+        
             await _loanService.ApproveLoan(loanApproval, cancellationToken);
             return Ok("Loan successfully approved.");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        
     }
 
     [HttpPost("reject")]
@@ -40,15 +35,21 @@ public class LoanController : BaseApiController
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return NotFound(ex.Message);
         }
     }
 
     [HttpGet("{id}/get-loan-details")]
-    [Authorize]
     public async Task<IActionResult> GetLoanDetails(int id, CancellationToken cancellationToken)
     {
-        var loanDetails = await _loanService.GetLoanDetails(id, cancellationToken);
-        return Ok(loanDetails);
+        try
+        {
+            var loanDetails = await _loanService.GetLoanDetails(id, cancellationToken);
+            return Ok(loanDetails);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 }
