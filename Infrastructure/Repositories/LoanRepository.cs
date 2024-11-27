@@ -14,6 +14,15 @@ public class LoanRepository : ILoanRepository
         _context = context;
     }
 
+    public async Task<ApprovedLoan> GetApprovedLoanById(int loanId, CancellationToken cancellationToken = default)
+    {
+        return await _context.ApprovedLoans
+        .Include(x => x.Customer)
+        .Include(x => x.Installments)
+        .Include(x => x.TermInterestRate)
+        .FirstOrDefaultAsync(l => l.Id == loanId, cancellationToken);
+    }
+
     public async Task<LoanRequest> GetLoanRequestById(int Id)
     {
         var loanRequest = await _context.LoanRequests
@@ -48,9 +57,7 @@ public class LoanRepository : ILoanRepository
             await transaction.RollbackAsync(cancellationToken);
             throw new InvalidOperationException("An error has occurred while trying to save the Loan and its Installments.", ex);
         }
-
     }
-
 
     public async Task UpdateLoanRequest(LoanRequest loanRequest)
     {

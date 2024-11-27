@@ -67,12 +67,11 @@ public class LoanService : ILoanService
 
             installments.Add(new Installment
             {
-                CapitalAmount = capitalAmount,
-                InterestAmount = interestAmount,
-                TotalAmount = capitalAmount + interestAmount,
+                CapitalAmount = Math.Round(capitalAmount),
+                InterestAmount = Math.Round(interestAmount),
+                TotalAmount = Math.Round(capitalAmount + interestAmount),
                 DueDate = DateTime.UtcNow.AddMonths(i).ToUniversalTime(),
                 Status = "Pending",
-                //ApprovedLoanId = 0
             });
         }
 
@@ -93,5 +92,40 @@ public class LoanService : ILoanService
         loanRequest.Status = "Rejected";
         loanRequest.RejectionReason = loanRejection.RejectionReason;
         await _loanRepository.UpdateLoanRequest(loanRequest);
+    }
+
+
+    public async Task<DetailedLoanDTO> GetLoanDetails(int approvedLoanId, CancellationToken cancellationToken = default)
+    {
+        var loan = await _loanRepository.GetApprovedLoanById(approvedLoanId, cancellationToken);
+
+        if (loan == null)
+            throw new KeyNotFoundException($"No approved loan found with ID {approvedLoanId}");
+
+        var totalToPay = loan.Installments.Sum(i => i.TotalAmount);
+        var paidInstallments = loan.Installments.Count(i => i.Status == "Paid");
+        var pendingInstallments = loan.Installments.Count(i => i.Status == "Pending");
+        var nextDueDate = loan.Installments
+                              .Where(i => i.Status == "Pending")
+                              .OrderBy(i => i.DueDate)
+                              .Select(i => (DateTime?)i.DueDate)
+                              .FirstOrDefault();
+
+        return new DetailedLoanDTO
+        {
+            CustomerId = loan.Customer.Id,
+            CustomerName = loan.Customer.FirstName,
+            ApprovalDate = loan.ApprovalDate,
+            RequestedAmount = loan.RequestAmount,
+            TotalToPay = Math.Round(totalToPay),
+            Profit = Math.Round(totalToPay - loan.RequestAmount),
+            TermInMonths = loan.TermInterestRate.TermInMonths,
+            LoanType = loan.LoanType,
+            InterestRate = loan.InterestRate,
+            PaidInstallments = paidInstallments,
+            PendingInstallments = pendingInstallments,
+            NextDueDate = nextDueDate,
+            Status = pendingInstallments == 0 ? "All installments are paid" : "Pending installments"
+        };
     }
 }

@@ -8,5 +8,6 @@ public interface ILoanRepository
     Task SaveApprovedLoan(ApprovedLoan approvedLoan, CancellationToken cancellationToken);
     //Task SaveInstallments(List<Installment> installments);
     Task UpdateLoanRequest(LoanRequest loanRequest);
-    Task<TermInterestRate> GetTerm(int termId); 
+    Task<TermInterestRate> GetTerm(int termId);
+    Task<ApprovedLoan> GetApprovedLoanById(int loanId, CancellationToken cancellationToken = default);
 }
