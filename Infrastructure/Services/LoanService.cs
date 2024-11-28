@@ -27,7 +27,7 @@ public class LoanService : ILoanService
         if (loanRequest == null || loanRequest.Status != "Pending Approval")
             throw new InvalidOperationException("The request is not available for approval.");
 
-        var term = await _termInterestRateRepository.GetInterestRateByTerm(loanRequest.TermInMonths);
+        var term = await _termInterestRateRepository.GetTermByMonth(loanRequest.TermInMonths);
         if (term == null)
             throw new KeyNotFoundException($"No interest rate found for term: {loanRequest.TermInMonths} months.");
 
@@ -94,10 +94,10 @@ public class LoanService : ILoanService
     public async Task<DetailedLoanDTO> GetLoanDetails(int approvedLoanId, CancellationToken cancellationToken = default)
     {
         var loan = await _loanRepository.GetApprovedLoanById(approvedLoanId, cancellationToken);
-        var term = await _loanRepository.GetTerm(loan.TermInterestRateId);
-
         if (loan == null)
             throw new KeyNotFoundException($"No approved loan found with ID {approvedLoanId}");
+
+        var term = await _loanRepository.GetTerm(loan.TermInterestRateId);
 
         var totalToPay = loan.Installments.Sum(i => i.TotalAmount);
         var paidInstallments = loan.Installments.Count(i => i.Status == "Paid");

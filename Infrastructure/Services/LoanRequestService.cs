@@ -31,7 +31,7 @@ public class LoanRequestService : ILoanRequestService
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
 
-        var term = await _termInterestRateRepository.GetInterestRateByTerm(loanRequestDTO.TermInMonths);
+        var term = await _termInterestRateRepository.GetTermByMonth(loanRequestDTO.TermInMonths);
         if (term == null) 
             throw new KeyNotFoundException($"No interest rate found for term: {loanRequestDTO.TermInMonths} months.");
 

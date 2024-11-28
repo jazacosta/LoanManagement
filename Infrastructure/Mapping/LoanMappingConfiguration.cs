@@ -20,7 +20,6 @@ public class LoanMappingConfiguration : IRegister
 
         config.NewConfig<LoanRequest, ApprovedLoan>()
             .Map(dest => dest.RequestAmount, src => src.Amount)
-            //.Map(dest => dest.InterestRate, src => src.TermInterestRate.InterestRate)
             .Map(dest => dest.ApprovalDate, src => DateTime.UtcNow)
             .Map(dest => dest.LoanRequestId, src => src.Id);
 

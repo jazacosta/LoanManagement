@@ -34,7 +34,7 @@ public class SimulatorService : ISimulatorService
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
 
-        var termInterestRate = await _termInterestRateRepository.GetInterestRateByTerm(installmentSimDTO.TermInMonths);
+        var termInterestRate = await _termInterestRateRepository.GetTermByMonth(installmentSimDTO.TermInMonths);
         if (termInterestRate == null)
             throw new KeyNotFoundException($"No interest rate found for term: {installmentSimDTO.TermInMonths} months.");
 

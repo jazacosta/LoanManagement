@@ -1,4 +1,5 @@
 ﻿using Core.DTOs;
+using Core.Entities;
 using Core.Interfaces.Repositories;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
@@ -14,19 +15,14 @@ public class TermInterestRateRepository : ITermInterestRateRepository
         _context = context;
     }
 
-    public async Task<TermInterestRateResponseDTO> GetInterestRateByTerm(int TermInMonths)
+    public async Task<TermInterestRate> GetTermByMonth(int termInMonths)
     {
-        var termInterestRate = await _context.TermInterestRates
-            .FirstOrDefaultAsync(x => x.TermInMonths == TermInMonths);
+        var term = await _context.TermInterestRates
+            .FirstOrDefaultAsync(x => x.TermInMonths == termInMonths);
 
-        if (termInterestRate == null)
+        if (term == null)
             return null;
 
-        return new TermInterestRateResponseDTO
-        {
-            Id = termInterestRate.Id,
-            TermInMonths = termInterestRate.TermInMonths,
-            InterestRate = termInterestRate.InterestRate
-        };
+        return term;
     }
 }

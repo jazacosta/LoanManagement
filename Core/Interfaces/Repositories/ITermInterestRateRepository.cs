@@ -1,8 +1,9 @@
 ﻿using Core.DTOs;
+using Core.Entities;
 
 namespace Core.Interfaces.Repositories;
 
 public interface ITermInterestRateRepository
 {
-    Task<TermInterestRateResponseDTO> GetInterestRateByTerm(int TermInMonths);
+    Task<TermInterestRate> GetTermByMonth(int TermInMonths);
 }
