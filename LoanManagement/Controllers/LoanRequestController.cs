@@ -25,9 +25,5 @@ public class LoanRequestController : BaseApiController
         {
             return NotFound(new { message = ex.Message });
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
-        }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Core.DTOs.LoanManagement;
+using Core.DTOs.Request;
 using Core.Entities;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
+using Infrastructure.Repositories;
 using Mapster;
 
 namespace Infrastructure.Services;
@@ -10,11 +12,13 @@ public class LoanService : ILoanService
 {
     private readonly ILoanRepository _loanRepository;
     private readonly IInstallmentRepository _installmentRepository;
+    private readonly ITermInterestRateRepository _termInterestRateRepository;
 
-    public LoanService(ILoanRepository loanRepository, IInstallmentRepository installmentRepository)
+    public LoanService(ILoanRepository loanRepository, IInstallmentRepository installmentRepository, ITermInterestRateRepository termInterestRateRepository)
     {
         _loanRepository = loanRepository;
         _installmentRepository = installmentRepository;
+        _termInterestRateRepository = termInterestRateRepository;
     }
 
     public async Task ApproveLoan(int Id)
@@ -23,8 +27,12 @@ public class LoanService : ILoanService
         if (loanRequest == null || loanRequest.Status != "Pending Approval")
             throw new InvalidOperationException("The request is not available for approval.");
 
+        var term = await _termInterestRateRepository.GetInterestRateByTerm(loanRequest.TermInMonths);
+        if (term == null)
+            throw new KeyNotFoundException($"No interest rate found for term: {loanRequest.TermInMonths} months.");
 
         var approvedLoan = loanRequest.Adapt<ApprovedLoan>();
+        approvedLoan.InterestRate = term.InterestRate;
         await _loanRepository.SaveApprovedLoan(approvedLoan);
 
         var installments = GenerateInstallments(approvedLoan.RequestAmount, approvedLoan.InterestRate, loanRequest.TermInMonths);

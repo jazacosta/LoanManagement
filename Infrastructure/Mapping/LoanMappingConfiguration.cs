@@ -14,13 +14,13 @@ public class LoanMappingConfiguration : IRegister
 
         config.NewConfig<LoanRequestDTO, LoanRequest>()
             .Map(dest => dest.RequestDate, src => DateTime.UtcNow)
-            .Map(dest => dest.Status, src => "PendingApproval");
+            .Map(dest => dest.Status, src => "Pending Approval");
 
         config.NewConfig<LoanRequest, LoanRequestResponseDTO>();
 
         config.NewConfig<LoanRequest, ApprovedLoan>()
             .Map(dest => dest.RequestAmount, src => src.Amount)
-            .Map(dest => dest.InterestRate, src => src.TermInterestRate.InterestRate)
+            //.Map(dest => dest.InterestRate, src => src.TermInterestRate.InterestRate)
             .Map(dest => dest.ApprovalDate, src => DateTime.UtcNow)
             .Map(dest => dest.LoanRequestId, src => src.Id);
 

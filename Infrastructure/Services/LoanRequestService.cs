@@ -37,6 +37,7 @@ public class LoanRequestService : ILoanRequestService
 
         var loanRequest = loanRequestDTO.Adapt<LoanRequest>();
         loanRequest.TermInMonths = term.TermInMonths;
+        loanRequest.TermInterestRateId = term.Id;
 
         await _loanRequestRepository.AddLoanRequest(loanRequest);
 

@@ -6,4 +6,5 @@ public class LoanRequestDTO
     public string LoanType { get; set; } = string.Empty;
     public int TermInMonths { get; set; }
     public decimal Amount { get; set; }
+    
 }

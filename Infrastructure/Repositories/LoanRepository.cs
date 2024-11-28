@@ -26,8 +26,9 @@ public class LoanRepository : ILoanRepository
     public async Task<LoanRequest> GetLoanRequestById(int Id)
     {
         var loanRequest = await _context.LoanRequests
-                .Include(x => x.TermInterestRate)
-                .FirstOrDefaultAsync(x => x.Id == Id && x.Status == "Pending Approval");
+                //.Include(x => x.TermInterestRate)
+                //.FirstOrDefaultAsync(x => x.Id == Id && x.Status == "Pending Approval");
+                .FindAsync(Id);
 
         if (loanRequest == null)
             throw new KeyNotFoundException($" The Loan request with Id {Id} was not found.");

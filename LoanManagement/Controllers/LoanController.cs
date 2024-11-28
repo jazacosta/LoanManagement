@@ -26,7 +26,7 @@ public class LoanController : BaseApiController
         catch (Exception ex)
         {
             return NotFound(ex.Message);
-        }     
+        }
     }
 
     [HttpPost("{Id}/reject")]
