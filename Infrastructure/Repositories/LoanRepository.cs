@@ -19,7 +19,6 @@ public class LoanRepository : ILoanRepository
         var approvedLoan = await _context.ApprovedLoans
                 .Include(x => x.Customer)
                 .Include(x => x.Installments)
-                //.Include(x => x.TermInterestRate)
                 .FirstOrDefaultAsync(l => l.Id == loanId, cancellationToken);
         return approvedLoan;
     }

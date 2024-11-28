@@ -2,6 +2,7 @@
 using Core.Entities;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
+using Mapster;
 using Microsoft.AspNetCore.Identity.Data;
 
 namespace Infrastructure.Services;
@@ -21,42 +22,16 @@ public class LoanRequestService : ILoanRequestService
 
     public async Task<LoanRequestResponseDTO> CreateLoanRequest(LoanRequestDTO loanRequestDTO)
     {
-    //    Console.WriteLine($"Loan Request Details:\n" +
-    //$"Customer ID: {loanRequestDTO.CustomerId}\n" +
-    //$"Loan Type: {loanRequestDTO.LoanType}\n" +
-    //$"Amount: {loanRequestDTO.Amount}\n" +
-    //$"Term Interest Rate ID: {loanRequestDTO.TermInMonths}\n" +
-    //$"Status: Pending Approval");
-
-        //Environment.Exit(0 );
         var term = await _termInterestRateRepository.GetInterestRateByTerm(loanRequestDTO.TermInMonths);
         if (term == null) 
             throw new KeyNotFoundException($"No interest rate found for term: {loanRequestDTO.TermInMonths} months.");
 
-        DateTime dateTime = DateTime.UtcNow;
 
-        var loanRequest = new LoanRequest 
-        {
-            CustomerId = loanRequestDTO.CustomerId,
-            RequestDate = dateTime,
-            LoanType = loanRequestDTO.LoanType,
-            TermInMonths = loanRequestDTO.TermInMonths,
-            Amount = loanRequestDTO.Amount,
-            TermInterestRateId = term.Id,   
-            Status = "Pending Approval"
-        };
+        var loanRequest = loanRequestDTO.Adapt<LoanRequest>();
+        loanRequest.TermInMonths = term.TermInMonths;
 
-        var result = await _loanRequestRepository.AddLoanRequest(loanRequest);
+        await _loanRequestRepository.AddLoanRequest(loanRequest);
 
-        return new LoanRequestResponseDTO
-        {
-            Id = result.Id,
-            CustomerId = result.CustomerId,
-            LoanType = result.LoanType,
-            Amount = result.Amount,
-            RequestDate = dateTime,
-            TermInMonths = term.TermInMonths,
-            Status = result.Status
-        };
+        return loanRequest.Adapt<LoanRequestResponseDTO>();
     }
 }

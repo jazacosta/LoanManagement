@@ -100,27 +100,20 @@ public class LoanService : ILoanService
                               .Where(i => i.Status == "Pending")
                               .OrderBy(i => i.DueDate)
                               .FirstOrDefault();
-                              //.Select(i => (DateTime?)i.DueDate)
 
         string message = dueDate != null
             ? dueDate.DueDate.ToString("yyyy-MM-dd")
             : "Todas las cuotas estan pagadas";
 
-        return new DetailedLoanDTO
-        {
-            CustomerId = loan.Customer.Id,
-            CustomerName = loan.Customer.FirstName,
-            ApprovalDate = loan.ApprovalDate,
-            RequestedAmount = loan.RequestAmount,
-            TotalToPay = Math.Round(totalToPay),
-            Profit = Math.Round(totalToPay - loan.RequestAmount),
-            TermInMonths = term.TermInMonths,
-            LoanType = loan.LoanType,
-            InterestRate = loan.InterestRate,
-            PaidInstallments = paidInstallments,
-            PendingInstallments = pendingInstallments,
-            NextDueDate = message,
-            Status = pendingInstallments == 0 ? "All installments are paid" : "Pending installments"
-        };
+        var response = loan.Adapt<DetailedLoanDTO>();
+        response.TotalToPay = Math.Round(totalToPay);
+        response.Profit = Math.Round(totalToPay - loan.RequestAmount);
+        response.TermInMonths = term.TermInMonths;
+        response.PaidInstallments = paidInstallments;
+        response.PendingInstallments = pendingInstallments;
+        response.NextDueDate = message;
+        response.Status = pendingInstallments == 0 ? "All installments are paid" : "Pending installments";
+
+        return response;
     }
 }
