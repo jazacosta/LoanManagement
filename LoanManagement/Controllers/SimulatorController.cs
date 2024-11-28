@@ -1,15 +1,18 @@
 ﻿using Core.DTOs.InstallmentSimulator;
 using Core.Interfaces.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LoanManagement.Controllers
 {
     public class SimulatorController : BaseApiController
     {
+        private readonly IValidator<InstallmentSimDTO> _validator;
         private readonly ISimulatorService _simulatorService;
 
-        public SimulatorController(ISimulatorService simulatorService)
+        public SimulatorController(IValidator<InstallmentSimDTO> validator, ISimulatorService simulatorService)
         {
+            _validator = validator;
             _simulatorService = simulatorService;
         }
 

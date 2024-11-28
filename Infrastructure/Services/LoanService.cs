@@ -71,7 +71,7 @@ public class LoanService : ILoanService
     {
         var loanRequest = await _loanRepository.GetLoanRequestById(Id);
 
-        if (loanRequest == null || loanRequest.Status != "Pending Approval") //searches for a lrID
+        if (loanRequest == null || loanRequest.Status != "Pending Approval")
             throw new InvalidOperationException("The loan request is not available for rejection.");
 
         if (string.IsNullOrWhiteSpace(RejectionReason))

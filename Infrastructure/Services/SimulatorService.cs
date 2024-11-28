@@ -2,16 +2,19 @@
 using Core.DTOs.Request;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
+using FluentValidation;
 using Mapster;
 
 namespace Infrastructure.Services;
 
 public class SimulatorService : ISimulatorService
 {
+    private readonly IValidator<InstallmentSimDTO> _validator;
     private readonly ITermInterestRateRepository _termInterestRateRepository;
 
-    public SimulatorService(ITermInterestRateRepository termInterestRateRepository)
+    public SimulatorService(IValidator<InstallmentSimDTO> validator, ITermInterestRateRepository termInterestRateRepository)
     {
+        _validator = validator;
         _termInterestRateRepository = termInterestRateRepository;
     }
 
@@ -27,6 +30,10 @@ public class SimulatorService : ISimulatorService
 
     public async Task<InstallmentSimResponseDTO> SimulateInstallment(InstallmentSimDTO installmentSimDTO)
     {
+        var validationResult = await _validator.ValidateAsync(installmentSimDTO);
+        if (!validationResult.IsValid)
+            throw new ValidationException(validationResult.Errors);
+
         var termInterestRate = await _termInterestRateRepository.GetInterestRateByTerm(installmentSimDTO.TermInMonths);
         if (termInterestRate == null)
             throw new KeyNotFoundException($"No interest rate found for term: {installmentSimDTO.TermInMonths} months.");

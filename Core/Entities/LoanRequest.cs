@@ -14,5 +14,5 @@ public class LoanRequest
     public Customer Customer { get; set; } = null!;
     public int TermInterestRateId { get; set; }
     public TermInterestRate TermInterestRate { get; set; } = null!;
-    public ApprovedLoan ApprovedLoan { get; set; } = null!; //1:1
+    public ApprovedLoan ApprovedLoan { get; set; } = null!;
 }

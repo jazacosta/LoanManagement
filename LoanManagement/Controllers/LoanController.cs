@@ -15,17 +15,22 @@ public class LoanController : BaseApiController
     }
 
     [HttpPost("{Id}/approve")]
-    //[Authorize(Roles = "admin")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> ApproveLoan([FromRoute] int Id)
     {
-        
+        try
+        {
             await _loanService.ApproveLoan(Id);
             return Ok("Loan successfully approved.");
-        
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }     
     }
 
     [HttpPost("{Id}/reject")]
-    //[Authorize(Roles = "admin")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> RejectLoan([FromRoute] int Id, [FromQuery] string RejectionReason)
     {
         try

@@ -53,7 +53,6 @@ namespace Infrastructure
             services.AddScoped<ISimulatorService, SimulatorService>();
             services.AddScoped<ILoanRequestService, LoanRequestService>();
             services.AddScoped<IAuthService, AuthService>();
-            //services.AddScoped<IInstallmentService, InstallmentService>();
             services.AddScoped<ILoanService, LoanService>();
 
             return services;

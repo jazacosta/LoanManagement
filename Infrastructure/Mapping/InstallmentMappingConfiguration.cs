@@ -1,5 +1,4 @@
-﻿using Core.DTOs.InstallmentPayment;
-using Core.DTOs.InstallmentSimulator;
+﻿using Core.DTOs.InstallmentSimulator;
 using Core.Entities;
 using Mapster;
 
@@ -11,6 +10,5 @@ public class InstallmentMappingConfiguration : IRegister
     {
         config.NewConfig<InstallmentSimDTO, InstallmentSimResponseDTO>();
 
-        config.NewConfig<Payment, PaymentDTO>();
     }
 }

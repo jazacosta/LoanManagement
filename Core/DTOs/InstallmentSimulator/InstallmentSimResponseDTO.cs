@@ -2,6 +2,6 @@
 
 public class InstallmentSimResponseDTO
 {
-    public decimal MonthlyInstallment { get; set; } //monthly amount
+    public decimal MonthlyInstallment { get; set; }
     public decimal TotalToPay { get; set; }
 }

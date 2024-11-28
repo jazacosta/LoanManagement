@@ -19,18 +19,10 @@ public class TermInterestRateRepository : ITermInterestRateRepository
         var termInterestRate = await _context.TermInterestRates
             .FirstOrDefaultAsync(x => x.TermInMonths == TermInMonths);
 
-        //var response = new TermInterestRateResponseDTO
-        //{
-        //    Id = termInterestRate.Id,
-        //    TermInMonths = termInterestRate.TermInMonths,
-        //    InterestRate = termInterestRate.InterestRate
-        //};
-
-
         if (termInterestRate == null)
             return null;
 
-        return new TermInterestRateResponseDTO //mappear!!
+        return new TermInterestRateResponseDTO
         {
             Id = termInterestRate.Id,
             TermInMonths = termInterestRate.TermInMonths,

@@ -12,7 +12,6 @@ public class ApprovedLoan
     public Customer Customer { get; set; } = null!;
     public int LoanRequestId { get; set; }
     public LoanRequest LoanRequest { get; set; } = null!;
-    //public TermInterestRate TermInterestRate { get; set; } = null!;
 
     public List<Installment> Installments { get; set; } = [];
 }

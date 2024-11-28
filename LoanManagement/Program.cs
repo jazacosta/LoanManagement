@@ -1,5 +1,4 @@
 using Infrastructure;
-using LoanManagement.Middlewares;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +11,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddSwaggerGen(options =>   //authorization management
+builder.Services.AddSwaggerGen(options =>  
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
@@ -48,7 +47,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.UseCors();
 app.UseAuthentication();

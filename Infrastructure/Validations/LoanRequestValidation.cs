@@ -7,10 +7,16 @@ public class LoanRequestValidation : AbstractValidator<LoanRequestDTO>
 {
     public LoanRequestValidation()
     {
+        RuleFor(x => x.CustomerId)
+           .NotNull()
+           .GreaterThan(0)
+           .WithMessage("CustomerId is required.");
+
         RuleFor(x => x.LoanType)
            .NotEmpty()
-           .WithMessage("Loan Type is required.")
-           .MaximumLength(50).WithMessage("Loan Type cannot exceed 50 characters.");
+           .Matches(@"^[a-zA-Z0-9\s]*$")
+           .MaximumLength(50)
+           .WithMessage("Loan Type must only contain letters, numbers or spaces and cannot exceed 50 characters.");
 
         RuleFor(x => x.TermInMonths)
             .NotEmpty()
@@ -19,7 +25,7 @@ public class LoanRequestValidation : AbstractValidator<LoanRequestDTO>
 
         RuleFor(x => x.Amount)
             .NotEmpty()
-            .GreaterThan(0)
-            .WithMessage("Amount must be greater than 0.");
+            .GreaterThanOrEqualTo(1000000)
+            .WithMessage("Amount must be greater than 1000000 and it cannot be empty.");
     }
 }
