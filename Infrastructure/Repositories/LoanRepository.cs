@@ -2,6 +2,7 @@
 using Core.Interfaces.Repositories;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 
 namespace Infrastructure.Repositories;
 
@@ -23,15 +24,13 @@ public class LoanRepository : ILoanRepository
         return approvedLoan;
     }
 
-    public async Task<LoanRequest> GetLoanRequestById(int Id)
+    public async Task<LoanRequest> GetLoanRequestById(int id)
     {
         var loanRequest = await _context.LoanRequests
-                //.Include(x => x.TermInterestRate)
-                //.FirstOrDefaultAsync(x => x.Id == Id && x.Status == "Pending Approval");
-                .FindAsync(Id);
+                .FindAsync(id);
 
         if (loanRequest == null)
-            throw new KeyNotFoundException($" The Loan request with Id {Id} was not found.");
+            throw new KeyNotFoundException($" The Loan request with Id {id} was not found.");
 
         return loanRequest;
     }
@@ -44,9 +43,8 @@ public class LoanRepository : ILoanRepository
 
     public async Task SaveApprovedLoan(ApprovedLoan approvedLoan)
     {
-            _context.ApprovedLoans.Add(approvedLoan);
-            _context.Installments.AddRange(approvedLoan.Installments);
-            await _context.SaveChangesAsync();
+        _context.ApprovedLoans.Add(approvedLoan);
+        await _context.SaveChangesAsync();
     }
 
     public async Task UpdateLoanRequest(LoanRequest loanRequest)

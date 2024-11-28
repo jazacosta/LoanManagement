@@ -2,6 +2,10 @@
 
 public class LoanRequest
 {
+    public LoanRequest()
+    {
+        
+    }
     public int Id { get; set; }
     public int CustomerId { get; set; }
     public string LoanType { get; set; } = string.Empty;

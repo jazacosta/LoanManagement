@@ -26,8 +26,6 @@ public class LoanMappingConfiguration : IRegister
         config.NewConfig<ApprovedLoan, DetailedLoanDTO>()
             .Map(dest => dest.CustomerName, src => $"{src.Customer.FirstName} {src.Customer.LastName}")
             .Map(dest => dest.RequestedAmount, src => src.RequestAmount);
-
-
-        
+       
     }
 }
